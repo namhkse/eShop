@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - SA_PASSWORD=Pass@word
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - eshop-sqldata:/var/opt/mssql
+       
+  issue-api:
+    build:
+      context: .
+      dockerfile: src/Catalog.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionString=Server=sqldata;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word
+    ports:
+      - "5101:8080"
+  
+volumes:
+  eshop-sqldata:
+    external: false
