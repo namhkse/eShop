@@ -9,11 +9,6 @@ using Pgvector;
 
 namespace Catalog.API.Infrastructure;
 
-public interface IDbSeeder<in TContext> where TContext : DbContext
-{
-    Task SeedAsync(TContext context);
-}
-
 public partial class CatalogContextSeed(
     IWebHostEnvironment env,
     IOptions<CatalogOptions> settings,
@@ -38,9 +33,10 @@ public partial class CatalogContextSeed(
                               Array.Empty<CatalogSourceEntry>();
 
             context.CatalogBrands.RemoveRange(context.CatalogBrands);
-            await context.CatalogBrands.AddRangeAsync(sourceItems.Select(x => x.Brand).Distinct()
-                .Where(brandName => brandName != null)
-                .Select(brandName => new CatalogBrand(brandName!)));
+            await context.CatalogBrands
+                .AddRangeAsync(sourceItems.Select(x => x.Brand).Distinct()
+                    .Where(brandName => brandName != null)
+                    .Select(brandName => new CatalogBrand(brandName!)));
             logger.LogInformation("Seeded catalog with {NumBrands} brands", context.CatalogBrands.Count());
 
             context.CatalogTypes.RemoveRange(context.CatalogTypes);

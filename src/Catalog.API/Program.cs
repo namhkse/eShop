@@ -1,19 +1,24 @@
 using Carter;
+using Catalog.API;
+using Catalog.API.Modules;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// TODO: builder.Services.AddOpenApi();
-builder.Services.AddCarter();
+builder.AddApplicationServices();
+
+builder.Services.AddProblemDetails();
+
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    // TODO: app.MapOpenApi();
+    app.MapOpenApi();
     app.MapScalarApiReference();
 }
 
-app.MapCarter();
+app.MapCatalogApi();
 
 app.Run();

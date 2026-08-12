@@ -1,24 +1,6 @@
 version: '3.4'
 
 services:
-  sqldata:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      - SA_PASSWORD=Pass@word
-      - ACCEPT_EULA=Y
-    ports:
-      - "1433:1433"
-    volumes:
-      - eshop-sqldata:/var/opt/mssql
-  
-  basket-api:
-    image: eshop/basket-api:${TAG:-latest}
-    build:
-      context: .
-      dockerfile: src/Basket.API/Dockerfile
-    ports:
-      - "5103:8080"
-       
   catalog-api:
     build:
       context: .
@@ -26,9 +8,29 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionString=Server=sqldata;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word
-    ports:
-      - "5101:8080"
   
+  db:
+    image: pgvector/pgvector:pg17 # PostgreSQL with pgvector support
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourWeak(!)Password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+ 
 volumes:
-  eshop-sqldata:
-    external: false
+  pgdata: # Stores data outside the container to ensure persistence
+  rabbitmq_data:
