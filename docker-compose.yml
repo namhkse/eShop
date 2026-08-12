@@ -10,8 +10,16 @@ services:
       - "1433:1433"
     volumes:
       - eshop-sqldata:/var/opt/mssql
+  
+  basket-api:
+    image: eshop/basket-api:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: src/Basket.API/Dockerfile
+    ports:
+      - "5103:8080"
        
-  issue-api:
+  catalog-api:
     build:
       context: .
       dockerfile: src/Catalog.API/Dockerfile
