@@ -18,8 +18,11 @@ public class PaymentMethod : Entity
 
     private int _cardTypeId;
     
-    // TODO: remove this
-    // public CardType CardType { get; private set; }
+    public CardType CardType { get; private set; }
+
+    protected PaymentMethod()
+    {
+    }
 
     public PaymentMethod(
         int cardTypeId,

@@ -30,7 +30,7 @@ public class Order : Entity,
 
     public int? PaymentId { get; private set; }
 
-    public static Order NewDraf()
+    public static Order NewDraft()
     {
         return new Order()
         {
@@ -55,6 +55,8 @@ public class Order : Entity,
         int? buyerId = null,
         int? paymentMethodId = null) : this()
     {
+        // FIXME: Fix this, the description column in the database is not null.
+        Description = "foobar";
         BuyerId = buyerId;
         PaymentId = paymentMethodId;
         OrderStatus = OrderStatus.Submitted;
@@ -199,4 +201,6 @@ public class Order : Entity,
             Description = $"The product items don't have stock: ({itemsStockRejectedDescription}).";
         }
     }
+
+    public decimal GetTotal() => _orderItems.Sum(o => o.UnitPrice * o.Units);
 }
