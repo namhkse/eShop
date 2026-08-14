@@ -1,7 +1,10 @@
 ﻿using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace Catalog.API;
+namespace Shared;
 
 public static class MigrateDbContextExtensions
 {
@@ -16,7 +19,7 @@ public static class MigrateDbContextExtensions
         where TContext : DbContext
     {
         // Enable migration tracing
-        services.AddOpenTelemetry().WithTracing(tracing => tracing.AddSource(ActivitySourceName));
+        // services.AddOpenTelemetry().WithTracing(tracing => tracing.AddSource(ActivitySourceName));
 
         return services.AddHostedService(sp => new MigrationHostedService<TContext>(sp, seeder));
     }

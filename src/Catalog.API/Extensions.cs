@@ -2,6 +2,7 @@ using Catalog.API.Infrastructure;
 using Catalog.API.IntegrationEvents;
 using Catalog.API.Services;
 using EventBusRabbitMQ;
+using IntegrationEventLogEF.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.API;
@@ -16,11 +17,9 @@ public static class Extensions
                 dbContextOptionsBuilder.UseNpgsql(builder => { builder.UseVector(); });
             });
 
-        // TODO: This is done for development ease but shouldn't be here in production
-        // builder.Services.AddMigration<CatalogContext, CatalogContextSeed>();
 
-        // Add the integration services that consume the DbContext
-        // TODO: builder.Services.AddTransient<IIntegrationEventLogService, IntegrationEventLogService<CatalogContext>>();
+        builder.Services.AddTransient<IIntegrationEventLogService, IntegrationEventLogService<CatalogContext>>();
+
         builder.Services.AddTransient<ICatalogIntegrationEventService, CatalogIntegrationEventService>();
 
         builder.AddRabbitMqEventBus("eventbus");
@@ -29,9 +28,16 @@ public static class Extensions
 
         if (builder.Configuration["OllamaEnabled"] is string ollamaEnabled && bool.Parse(ollamaEnabled))
         {
-            builder.AddOllamaApiClient("embedding").AddEmbeddingGenerator();
+            builder.AddOllamaApiClient("embedding")
+                .AddEmbeddingGenerator();
         }
 
         builder.Services.AddScoped<ICatalogAI, CatalogAI>();
+    }
+
+    public static void AddSeeding(this IHostApplicationBuilder builder)
+    {
+        // This is done for development ease but shouldn't be here in production
+        // builder.Services.AddMigration<CatalogContext, CatalogContextSeed>();
     }
 }

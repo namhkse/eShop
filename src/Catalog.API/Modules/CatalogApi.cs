@@ -53,13 +53,13 @@ public static class CatalogApi
             .WithName("CreateItem")
             .WithSummary("Create a catalog item")
             .WithDescription("Create a new item in the catalog");
-        
+
         api.MapPut("/items", UpdateItemV1)
             .WithName("UpdateItem")
             .WithSummary("Create or replace a catalog item")
             .WithDescription("Create or replace a catalog item")
             .WithTags("Items");
-        
+
         api.MapDelete("/items/{id:int}", DeleteItemById)
             .WithName("DeleteItem")
             .WithSummary("Delete catalog item")
@@ -282,23 +282,19 @@ public static class CatalogApi
         return await GetAllItems(paginationRequest, services, null, null, brandId);
     }
 
-    public static async Task<Results<Created, BadRequest<ProblemDetails>, NotFound<ProblemDetails>>> UpdateItemV1(
+    public static async Task<IResult> UpdateItemV1(
         HttpContext httpContext,
         [AsParameters] CatalogServices services,
         CatalogItem productToUpdate)
     {
-        if (productToUpdate?.Id == null)
-        {
-            return TypedResults.BadRequest<ProblemDetails>(new()
-            {
-                Detail = "Item id must be provided in the request body."
-            });
-        }
+        if (productToUpdate?.Id != null)
+            return await UpdateItem(httpContext, productToUpdate.Id, services, productToUpdate);
 
-        return await UpdateItem(httpContext, productToUpdate.Id, services, productToUpdate);
+        return TypedResults.BadRequest<ProblemDetails>(new ProblemDetails
+            { Detail = "Item id must be provided in the request body." });
     }
 
-    public static async Task<Results<Created, BadRequest<ProblemDetails>, NotFound<ProblemDetails>>> UpdateItem(
+    public static async Task<IResult> UpdateItem(
         HttpContext httpContext,
         [Description("The id of the catalog item to delete")]
         int id,
@@ -309,40 +305,33 @@ public static class CatalogApi
 
         if (catalogItem == null)
         {
-            return TypedResults.NotFound<ProblemDetails>(new()
-            {
-                Detail = $"Item with id {id} not found."
-            });
+            return TypedResults.NotFound<ProblemDetails>(new ProblemDetails
+                { Detail = $"Item with id {id} not found." });
         }
 
-        productToUpdate.Price += 1; 
-        
         // Update current product
         var catalogEntry = services.Context.Entry(catalogItem);
         catalogEntry.CurrentValues.SetValues(productToUpdate);
-
         catalogItem.Embedding = await services.CatalogAI.GetEmbeddingAsync(catalogItem);
 
         var priceEntry = catalogEntry.Property(i => i.Price);
-        
+
         // Save product's data and publish integration event through the Event Bus if price has changed
-        if (priceEntry.IsModified) 
+        if (priceEntry.IsModified)
         {
-            //Create Integration Event to be published through the Event Bus
             var priceChangedEvent = new ProductPriceChangedIntegrationEvent(
                 catalogItem.Id,
                 productToUpdate.Price,
                 priceEntry.OriginalValue
             );
-
-            // Achieving atomicity between original Catalog database operation and
-            // the IntegrationEventLog thanks to a local transaction
+            
+            // Save the event into the database.
             await services.EventService.SaveEventAndCatalogContextChangesAsync(priceChangedEvent);
-
-            // Publish through the Event Bus and mark the saved event as published
+            
+            // Publish the event and update its state. 
             await services.EventService.PublishThroughEventBusAsync(priceChangedEvent);
         }
-        else // Just save the updated product because the Product's Price hasn't changed.
+        else
         {
             await services.Context.SaveChangesAsync();
         }

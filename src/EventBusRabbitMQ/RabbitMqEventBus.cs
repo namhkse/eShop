@@ -1,5 +1,7 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using EventBus;
+using EventBus.Abstractions;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -95,12 +97,42 @@ public sealed class RabbitMqEventBus(
         return Task.CompletedTask;
     }
 
-    private Task OnMessageReceived(object sender, BasicDeliverEventArgs @event)
+    private async Task OnMessageReceived(object sender, BasicDeliverEventArgs eventArgs)
     {
-        // TODO: 
-        return Task.CompletedTask;
+
+        var eventName = eventArgs.RoutingKey;
+        var message = Encoding.UTF8.GetString(eventArgs.Body.Span);
+
+        try
+        {
+            await ProcessEvent(eventName, message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Error processing message \"{Message\"", message);
+        }
+        
+        await consumerChannel.BasicAckAsync(eventArgs.DeliveryTag, false);
     }
 
+    private async Task ProcessEvent(string eventName, string message)
+    {
+        using var scope = serviceProvider.CreateScope();
+
+        if (!_subscriptionInfo.EventTypes.TryGetValue(eventName, out var eventType))
+        {
+            logger.LogWarning("Unable to resolve event type for event name {EventName}", eventName);
+            return;
+        }
+        
+        var integrationEvent = JsonSerializer.Deserialize(message, eventType) as IntegrationEvent;
+
+        foreach (var handler in scope.ServiceProvider.GetKeyedServices<IIntegrationEventHandler>(eventType))
+        {
+            await handler.Handle(integrationEvent); 
+        }
+    }
+    
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
