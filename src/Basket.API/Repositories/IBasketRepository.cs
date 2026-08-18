@@ -9,10 +9,3 @@ public interface IBasketRepository
     Task<CustomerBasket> UpdateBasketAsync(CustomerBasket basket);
     Task<bool> DeleteBasketAsync(string id);
 }
-
-[JsonSerializable(typeof(CustomerBasket))]
-[JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
-public partial class BasketSerializationContext : JsonSerializerContext
-{
-
-}

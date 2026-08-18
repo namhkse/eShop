@@ -1,10 +1,12 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Basket.API.Models;
 using StackExchange.Redis;
 
 namespace Basket.API.Repositories;
 
-public class RedisBasketRepository(ILogger<RedisBasketRepository> logger, IConnectionMultiplexer redis) : IBasketRepository
+public class RedisBasketRepository(ILogger<RedisBasketRepository> logger, IConnectionMultiplexer redis)
+    : IBasketRepository
 {
     private readonly IDatabase _database = redis.GetDatabase();
 
@@ -21,30 +23,52 @@ public class RedisBasketRepository(ILogger<RedisBasketRepository> logger, IConne
         return await _database.KeyDeleteAsync(GetBasketKey(id));
     }
 
+    public async Task<CustomerBasket> GetBasketAsync_old(string customerId)
+    {
+        using var data = await _database.StringGetLeaseAsync(GetBasketKey(customerId));
+        if (data is null || data.Length == 0) return null;
+        return JsonSerializer.Deserialize(data.Span, BasketSerializationContext.Default.CustomerBasket);
+    }
+    
     public async Task<CustomerBasket> GetBasketAsync(string customerId)
     {
         using var data = await _database.StringGetLeaseAsync(GetBasketKey(customerId));
 
         if (data is null || data.Length == 0)
         {
-            return null;
+            var basket = new CustomerBasket(customerId);
+
+            await _database.StringSetAsync(
+                GetBasketKey(customerId),
+                JsonSerializer.SerializeToUtf8Bytes(
+                    basket,
+                    BasketSerializationContext.Default.CustomerBasket));
+
+            return basket;
         }
-        return JsonSerializer.Deserialize(data.Span, BasketSerializationContext.Default.CustomerBasket);
+
+        return JsonSerializer.Deserialize(
+            data.Span,
+            BasketSerializationContext.Default.CustomerBasket)!;
     }
 
     public async Task<CustomerBasket> UpdateBasketAsync(CustomerBasket basket)
     {
         var json = JsonSerializer.SerializeToUtf8Bytes(basket, BasketSerializationContext.Default.CustomerBasket);
         var created = await _database.StringSetAsync(GetBasketKey(basket.BuyerId), json);
-
         if (!created)
         {
             logger.LogInformation("Problem occurred persisting the item.");
             return null;
         }
 
-
         logger.LogInformation("Basket item persisted successfully.");
         return await GetBasketAsync(basket.BuyerId);
     }
+}
+
+[JsonSerializable(typeof(CustomerBasket))]
+[JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
+public partial class BasketSerializationContext : JsonSerializerContext
+{
 }

@@ -1,25 +1,22 @@
-using Basket.API.Services;
+using Basket.API.Extensions;
+using Basket.API.Grpc;
+using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// builder.AddDefaultAuthentication();
-//
-// builder.AddRedisClient("redis");
-//
-// builder.Services.AddSingleton<IBasketRepository, RedisBasketRepository>();
-//
-// builder.AddRabbitMqEventBus("eventbus")
-//     .AddSubscription<OrderStartedIntegrationEvent, OrderStartedIntegrationEventHandler>()
-//     .ConfigureJsonOptions(options => options.TypeInfoResolverChain.Add(IntegrationEventContext.Default));
+builder.AddBasicServiceDefaults();
+
+builder.AddApplicationServices();
+
 builder.Services.AddGrpc();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-app.MapGrpcService<GreeterService>();
-app.MapGet("/",
-    () =>
-        "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapDefaultEndpoints();
+
+app.MapGrpcService<BasketService>();
 
 app.Run();

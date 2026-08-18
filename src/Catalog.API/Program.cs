@@ -1,6 +1,6 @@
 using Carter;
 using Catalog.API;
-using Catalog.API.Modules;
+using Catalog.API.Apis;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);

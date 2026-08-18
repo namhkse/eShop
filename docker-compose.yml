@@ -1,14 +1,13 @@
 version: '3.4'
 
 services:
-  catalog-api:
-    build:
-      context: .
-      dockerfile: src/Catalog.API/Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionString=Server=sqldata;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word
-  
+#  catalog-api:
+#    build:
+#      context: .
+#      dockerfile: src/Catalog.API/Dockerfile
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
+#      - ConnectionString=Server=sqldata;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word
   db:
     image: pgvector/pgvector:pg17 # PostgreSQL with pgvector support
     environment:
@@ -30,7 +29,17 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
  
 volumes:
   pgdata: # Stores data outside the container to ensure persistence
   rabbitmq_data:
+  redis_data:
