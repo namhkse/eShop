@@ -1,4 +1,4 @@
-﻿namespace eShop.WebApp.Services;
+﻿namespace Shop.WebApp.Services;
 
 public class BasketItem
 {
@@ -8,4 +8,5 @@ public class BasketItem
     public decimal UnitPrice { get; set; }
     public decimal OldUnitPrice { get; set; }
     public int Quantity { get; set; }
+    public string PictureUrl { get; set; }
 }

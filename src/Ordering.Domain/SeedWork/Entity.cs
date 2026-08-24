@@ -14,7 +14,7 @@ public abstract class Entity
         set { _Id = value; }
     }
 
-    private List<INotification> _domainEvents;
+    private List<INotification> _domainEvents = new();
     
     public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
 
@@ -27,6 +27,11 @@ public abstract class Entity
     public void RemoveDomainEvent(INotification eventItem)
     {
         _domainEvents?.Remove(eventItem);
+    }
+    
+    public void ClearDomainEvents()
+    {
+        _domainEvents?.Clear();
     }
     
     public bool IsTransient() => this.Id == default;
@@ -65,7 +70,7 @@ public abstract class Entity
             return base.GetHashCode();
     }
 
-    public static bool operator ==(Entity left, Entity right)
+    public static bool operator ==(Entity? left, Entity? right)
     {
         if (Object.Equals(left, null))
             return (Object.Equals(right, null)) ? true : false;

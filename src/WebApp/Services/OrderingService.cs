@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace eShop.WebApp.Services;
+namespace Shop.WebApp.Services;
 
 public class OrderingService(HttpClient httpClient)
 {

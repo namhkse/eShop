@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Basket.API.Extensions;
 using Basket.API.Models;
 using Basket.API.Repositories;
 using Grpc.Core;

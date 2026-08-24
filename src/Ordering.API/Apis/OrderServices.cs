@@ -1,5 +1,5 @@
 using MediatR;
-using Ordering.API.Application.Queries;
+using Ordering.API.Application.Orders.QueryOrder;
 using Ordering.API.Infrastructure.Services;
 
 namespace Ordering.API.Apis;

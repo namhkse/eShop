@@ -6,23 +6,8 @@ namespace ServiceDefaults;
 
 public static class Extensions
 {
-    public static IHostApplicationBuilder AddBasicServiceDefaults(this IHostApplicationBuilder builder)
-    {
-        // TODO: Add health check
-        // TODO: Add open telemetry
-        return builder;
-    }
-
-    public static WebApplication MapDefaultEndpoints(this WebApplication app)
-    {
-        // TODO: map /health and /alive APIs
-        return app;
-    }
-    
     public static IHostApplicationBuilder AddServiceDefaults(this IHostApplicationBuilder builder)
     {
-        builder.AddBasicServiceDefaults();
-        
         builder.Services.AddServiceDiscovery();
         
         builder.Services.ConfigureHttpClientDefaults(http =>

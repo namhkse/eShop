@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using eShop.WebAppComponents.Catalog;
 using eShop.WebAppComponents.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Shop.WebApp.Extensions;
 
-namespace eShop.WebApp.Services;
+namespace Shop.WebApp.Services;
 
 public class BasketState(
     BasketService basketService,
@@ -144,6 +145,9 @@ public class BasketState(
                     ProductName = catalogItem.Name,
                     UnitPrice = catalogItem.Price,
                     Quantity = item.Quantity,
+                    
+                    // TODO: Fix lack pictureURL
+                    PictureUrl = "foobar"
                 };
                 basketItems.Add(orderItem);
             }

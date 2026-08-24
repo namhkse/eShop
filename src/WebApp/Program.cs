@@ -1,8 +1,9 @@
-﻿using eShop.WebApp.Components;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ServiceDefaults;
+using Shop.WebApp.Components;
+using Shop.WebApp.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,16 +13,11 @@ builder.AddApplicationServices();
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
-
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

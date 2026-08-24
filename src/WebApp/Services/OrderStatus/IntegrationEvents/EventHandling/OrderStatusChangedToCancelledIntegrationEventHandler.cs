@@ -1,18 +1,23 @@
 ﻿using System.Threading.Tasks;
-using eShop.WebApp.Services.OrderStatus.IntegrationEvents.Events;
-using EventBus.Abstractions;
+using MassTransit;
 using Microsoft.Extensions.Logging;
+using Shop.Contracts.Orders;
 
-namespace eShop.WebApp.Services.OrderStatus.IntegrationEvents.EventHandling;
+namespace Shop.WebApp.Services.OrderStatus.IntegrationEvents.EventHandling;
 
 public class OrderStatusChangedToCancelledIntegrationEventHandler(
     OrderStatusNotificationService orderStatusNotificationService,
     ILogger<OrderStatusChangedToCancelledIntegrationEventHandler> logger)
-    : IIntegrationEventHandler<OrderStatusChangedToCancelledIntegrationEvent>
+    : IConsumer<OrderStatusChangedToCancelledIntegrationEvent>
 {
-    public async Task Handle(OrderStatusChangedToCancelledIntegrationEvent @event)
+    public async Task Consume(ConsumeContext<OrderStatusChangedToCancelledIntegrationEvent> context)
     {
-        logger.LogInformation("Handling integration event: {IntegrationEventId} - ({@IntegrationEvent})", @event.Id, @event);
-        await orderStatusNotificationService.NotifyOrderStatusChangedAsync(@event.BuyerIdentityGuid);
+        var message = context.Message;
+        
+        logger.LogInformation("Handling integration event: {IntegrationEventId} - ({@IntegrationEvent})",
+            context.MessageId,
+            message);
+        
+        await orderStatusNotificationService.NotifyOrderStatusChangedAsync(message.BuyerIdentityGuid);
     }
 }

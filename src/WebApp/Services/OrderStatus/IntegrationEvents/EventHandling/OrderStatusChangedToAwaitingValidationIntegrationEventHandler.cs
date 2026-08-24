@@ -1,18 +1,24 @@
 ﻿using System.Threading.Tasks;
-using eShop.WebApp.Services.OrderStatus.IntegrationEvents.Events;
-using EventBus.Abstractions;
+using MassTransit;
 using Microsoft.Extensions.Logging;
+using Shop.Contracts.Orders;
 
-namespace eShop.WebApp.Services.OrderStatus.IntegrationEvents.EventHandling;
+namespace Shop.WebApp.Services.OrderStatus.IntegrationEvents.EventHandling;
 
 public class OrderStatusChangedToAwaitingValidationIntegrationEventHandler(
     OrderStatusNotificationService orderStatusNotificationService,
     ILogger<OrderStatusChangedToAwaitingValidationIntegrationEventHandler> logger)
-    : IIntegrationEventHandler<OrderStatusChangedToAwaitingValidationIntegrationEvent>
+    : IConsumer<OrderStatusChangedToAwaitingValidationIntegrationEvent>
 {
-    public async Task Handle(OrderStatusChangedToAwaitingValidationIntegrationEvent @event)
+    public async Task Consume(ConsumeContext<OrderStatusChangedToAwaitingValidationIntegrationEvent> context)
     {
-        logger.LogInformation("Handling integration event: {IntegrationEventId} - ({@IntegrationEvent})", @event.Id, @event);
-        await orderStatusNotificationService.NotifyOrderStatusChangedAsync(@event.BuyerIdentityGuid);
+        var message = context.Message;
+
+        logger.LogInformation(
+            "Handling integration event: {IntegrationEventId} - ({@IntegrationEvent})",
+            context.MessageId,
+            message);
+        
+        await orderStatusNotificationService.NotifyOrderStatusChangedAsync(message.BuyerIdentityGuid);
     }
 }

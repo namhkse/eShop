@@ -1,5 +1,7 @@
 using EventBus;
 using MediatR;
+using Ordering.API.Application.Orders.CancelOrder;
+using Ordering.API.Application.Orders.CreateOrder;
 using Ordering.Infrastructure.Idempotency;
 
 namespace Ordering.API.Application.Commands;

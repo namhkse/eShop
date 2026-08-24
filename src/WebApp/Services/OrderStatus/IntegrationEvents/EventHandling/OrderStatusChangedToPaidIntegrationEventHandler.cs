@@ -1,18 +1,23 @@
 ﻿using System.Threading.Tasks;
-using eShop.WebApp.Services.OrderStatus.IntegrationEvents.Events;
-using EventBus.Abstractions;
+using MassTransit;
 using Microsoft.Extensions.Logging;
+using Shop.Contracts.Orders;
 
-namespace eShop.WebApp.Services.OrderStatus.IntegrationEvents.EventHandling;
+namespace Shop.WebApp.Services.OrderStatus.IntegrationEvents.EventHandling;
 
 public class OrderStatusChangedToPaidIntegrationEventHandler(
     OrderStatusNotificationService orderStatusNotificationService,
     ILogger<OrderStatusChangedToPaidIntegrationEventHandler> logger)
-    : IIntegrationEventHandler<OrderStatusChangedToPaidIntegrationEvent>
+    : IConsumer<OrderStatusChangedToPaidIntegrationEvent>
 {
-    public async Task Handle(OrderStatusChangedToPaidIntegrationEvent @event)
+    public async Task Consume(ConsumeContext<OrderStatusChangedToPaidIntegrationEvent> context)
     {
-        logger.LogInformation("Handling integration event: {IntegrationEventId} - ({@IntegrationEvent})", @event.Id, @event);
+        var @event = context.Message;
+        
+        logger.LogInformation("Handling integration event: {IntegrationEventId} - ({@IntegrationEvent})",
+            context.MessageId,
+            @event);
+        
         await orderStatusNotificationService.NotifyOrderStatusChangedAsync(@event.BuyerIdentityGuid);
     }
 }

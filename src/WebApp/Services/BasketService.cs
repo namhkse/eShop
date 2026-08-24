@@ -4,7 +4,7 @@ using Basket.API;
 using GrpcBasketItem = Basket.API.BasketItem;
 using GrpcBasketClient = Basket.API.Basket.BasketClient;
 
-namespace eShop.WebApp.Services;
+namespace Shop.WebApp.Services;
 
 public class BasketService(GrpcBasketClient basketClient)
 {

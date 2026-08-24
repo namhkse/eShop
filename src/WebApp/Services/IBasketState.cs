@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using eShop.WebAppComponents.Catalog;
 
-namespace eShop.WebApp.Services
+namespace Shop.WebApp.Services
 {
     public interface IBasketState
     {

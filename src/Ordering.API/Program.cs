@@ -1,40 +1,27 @@
-using EventBusRabbitMQ;
-using IntegrationEventLogEF.Services;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Ordering.API.Apis;
-using Ordering.API.Application;
 using Ordering.API.Application.Behaviors;
-using Ordering.API.Application.IntegrationEvents;
-using Ordering.API.Application.Queries;
-using Ordering.API.Infrastructure;
+using Ordering.API.Application.IntegrationEvents.EventHandling;
+using Ordering.API.Application.Orders.QueryOrder;
 using Ordering.API.Infrastructure.Services;
 using Ordering.Domain.BuyerAggregate;
 using Ordering.Domain.OrderAggregate;
 using Ordering.Infrastructure;
 using Ordering.Infrastructure.Idempotency;
 using Ordering.Infrastructure.Repositories;
-using Scalar.AspNetCore;
-using Shared;
+using ServiceDefaults;
+using Shop.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
 
-// The OpenAPI service
-services.AddOpenApi();
-
 // The database context
 services.AddDbContext<OrderingContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("OrderingDB"));
-});
+    options.UseNpgsql(builder.Configuration.GetConnectionString("OrderingDB")));
 
-// Integration services
-services.AddTransient<IIntegrationEventLogService, IntegrationEventLogService<OrderingContext>>();
-services.AddTransient<IOrderingIntegrationEventService, OrderingIntegrationEventService>();
-
-builder.AddRabbitMqEventBus("eventbus");
-// TODO: .AddSubscription<OrderStock>()
+// TODO: builder.Services.AddMigration<OrderingContext, OrderingContextSeed>();
 
 services.AddHttpContextAccessor();
 services.AddTransient<IIdentityService, IdentityService>();
@@ -44,11 +31,38 @@ services.AddScoped<IBuyerRepository, BuyerRepository>();
 services.AddScoped<IOrderRepository, OrderRepository>();
 services.AddScoped<IRequestManager, RequestManager>();
 
-// Configure mediatR
+builder.AddDefaultAuthentication();
+
+builder.Services.AddMassTransit(busConfigurator =>
+{
+    var rabbitMqSettings = builder.Configuration
+        .GetSection(nameof(RabbitMqSettings))
+        .Get<RabbitMqSettings>()!;
+
+    busConfigurator.SetKebabCaseEndpointNameFormatter();
+
+    busConfigurator.AddConsumer<GracePeriodConfirmedIntegrationEventHandler>();
+    busConfigurator.AddConsumer<OrderPaymentFailedIntegrationEventHandler>();
+    busConfigurator.AddConsumer<OrderPaymentSucceededIntegrationEventHandler>();
+    busConfigurator.AddConsumer<OrderStockConfirmedIntegrationEventHandler>();
+    busConfigurator.AddConsumer<OrderStockRejectedIntegrationEventHandler>();
+
+    busConfigurator.UsingRabbitMq((ctx, cfg) =>
+        {
+            cfg.Host(rabbitMqSettings.Uri, "/", h =>
+            {
+                h.Username(rabbitMqSettings.UserName);
+                h.Password(rabbitMqSettings.Password);
+            });
+
+            cfg.ConfigureEndpoints(ctx);
+        }
+    );
+});
+
 services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblyContaining(typeof(Program));
-
     cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
     cfg.AddOpenBehavior(typeof(ValidatorBehavior<,>));
     cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
@@ -56,12 +70,6 @@ services.AddMediatR(cfg =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
-
-app.MapOrdersApi();
+app.MapOrdersApiV1();
 
 app.Run();

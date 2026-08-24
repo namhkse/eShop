@@ -1,6 +1,6 @@
 ﻿using eShop.WebAppComponents.Services;
 
-namespace eShop.WebApp.Services;
+namespace Shop.WebApp.Services;
 
 public class ProductImageUrlProvider : IProductImageUrlProvider
 {

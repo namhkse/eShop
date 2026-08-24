@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading.Tasks;
-using eShop.WebApp.Services.OrderStatus;
-using eShop.WebApp.Services.OrderStatus.IntegrationEvents.EventHandling;
-using eShop.WebApp.Services.OrderStatus.IntegrationEvents.Events;
 using eShop.WebAppComponents.Services;
-using EventBus;
-using EventBusRabbitMQ;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -17,15 +12,47 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
 using ServiceDefaults;
+using Shop.Contracts;
+using Shop.WebApp.Services;
+using Shop.WebApp.Services.OrderStatus;
+using Shop.WebApp.Services.OrderStatus.IntegrationEvents.EventHandling;
+
+namespace Shop.WebApp.Extensions;
 
 public static class Extensions
 {
     public static void AddApplicationServices(this IHostApplicationBuilder builder)
     {
         builder.AddAuthenticationServices();
+        
+        builder.Services.AddMassTransit(busConfigurator =>
+        {
+            var rabbitMqSettings = builder.Configuration
+                .GetSection(nameof(RabbitMqSettings))
+                .Get<RabbitMqSettings>()!;
 
-        builder.AddRabbitMqEventBus("EventBus")
-               .AddEventBusSubscriptions();
+            busConfigurator.SetKebabCaseEndpointNameFormatter();
+
+            busConfigurator.AddConsumer<OrderStatusChangedToAwaitingValidationIntegrationEventHandler>();
+            busConfigurator.AddConsumer<OrderStatusChangedToShippedIntegrationEventHandler>();
+            busConfigurator.AddConsumer<OrderStatusChangedToPaidIntegrationEventHandler>();
+            busConfigurator.AddConsumer<OrderStatusChangedToShippedIntegrationEventHandler>();
+            busConfigurator.AddConsumer<OrderStatusChangedToStockConfirmedIntegrationEventHandler>();
+            busConfigurator.AddConsumer<OrderStatusChangedToSubmittedIntegrationEventHandler>();
+
+            busConfigurator.UsingRabbitMq((ctx, cfg) =>
+                {
+                    cfg.Host(rabbitMqSettings.Uri, "/", h =>
+                    {
+                        h.Username(rabbitMqSettings.UserName);
+                        h.Password(rabbitMqSettings.Password);
+                    });
+
+                    cfg.ConfigureEndpoints(ctx);
+                }
+            );
+        });
+
 
         builder.Services.AddHttpForwarderWithServiceDiscovery();
 
@@ -45,19 +72,9 @@ public static class Extensions
             .AddApiVersion(2.0)
             .AddAuthToken();
 
-        builder.Services.AddHttpClient<OrderingService>(o => o.BaseAddress = new("https+http://ordering-api"))
+        builder.Services.AddHttpClient<OrderingService>(o => o.BaseAddress = new("http://localhost:6003"))
             .AddApiVersion(1.0)
             .AddAuthToken();
-    }
-
-    public static void AddEventBusSubscriptions(this IEventBusBuilder eventBus)
-    {
-        eventBus.AddSubscription<OrderStatusChangedToAwaitingValidationIntegrationEvent, OrderStatusChangedToAwaitingValidationIntegrationEventHandler>();
-        eventBus.AddSubscription<OrderStatusChangedToPaidIntegrationEvent, OrderStatusChangedToPaidIntegrationEventHandler>();
-        eventBus.AddSubscription<OrderStatusChangedToStockConfirmedIntegrationEvent, OrderStatusChangedToStockConfirmedIntegrationEventHandler>();
-        eventBus.AddSubscription<OrderStatusChangedToShippedIntegrationEvent, OrderStatusChangedToShippedIntegrationEventHandler>();
-        eventBus.AddSubscription<OrderStatusChangedToCancelledIntegrationEvent, OrderStatusChangedToCancelledIntegrationEventHandler>();
-        eventBus.AddSubscription<OrderStatusChangedToSubmittedIntegrationEvent, OrderStatusChangedToSubmittedIntegrationEventHandler>();
     }
 
     public static void AddAuthenticationServices(this IHostApplicationBuilder builder)
@@ -74,27 +91,27 @@ public static class Extensions
         // Add Authentication services
         services.AddAuthorization();
         services.AddAuthentication(options =>
-        {
-            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-        })
-        .AddCookie(options => options.ExpireTimeSpan = TimeSpan.FromMinutes(sessionCookieLifetime))
-        .AddOpenIdConnect(options =>
-        {
-            options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.Authority = identityUrl;
-            options.SignedOutRedirectUri = callBackUrl;
-            options.ClientId = "webapp";
-            options.ClientSecret = "secret";
-            options.ResponseType = "code";
-            options.SaveTokens = true;
-            options.GetClaimsFromUserInfoEndpoint = true;
-            options.RequireHttpsMetadata = false;
-            options.Scope.Add("openid");
-            options.Scope.Add("profile");
-            options.Scope.Add("orders");
-            options.Scope.Add("basket");
-        });
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            })
+            .AddCookie(options => options.ExpireTimeSpan = TimeSpan.FromMinutes(sessionCookieLifetime))
+            .AddOpenIdConnect(options =>
+            {
+                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.Authority = identityUrl;
+                options.SignedOutRedirectUri = callBackUrl;
+                options.ClientId = "webapp";
+                options.ClientSecret = "secret";
+                options.ResponseType = "code";
+                options.SaveTokens = true;
+                options.GetClaimsFromUserInfoEndpoint = true;
+                options.RequireHttpsMetadata = false;
+                options.Scope.Add("openid");
+                options.Scope.Add("profile");
+                options.Scope.Add("orders");
+                options.Scope.Add("basket");
+            });
 
         // Blazor auth services
         services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();

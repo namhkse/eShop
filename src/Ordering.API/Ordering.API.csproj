@@ -8,16 +8,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentValidation" Version="12.1.0" />
-        <PackageReference Include="MediatR" Version="14.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
+        <PackageReference Include="FluentValidation"/>
+        <PackageReference Include="MediatR"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
-        <PackageReference Include="Scalar.AspNetCore" Version="2.16.20" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
+        <PackageReference Include="MassTransit" />
+        <PackageReference Include="MassTransit.RabbitMQ" />
     </ItemGroup>
 
     <ItemGroup>
@@ -27,11 +28,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
-      <ProjectReference Include="..\EventBus\EventBus.csproj" />
       <ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
       <ProjectReference Include="..\Ordering.Infrastructure\Ordering.Infrastructure.csproj" />
+      <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
       <ProjectReference Include="..\Shared\Shared.csproj" />
+      <ProjectReference Include="..\Shop.Contracts\Shop.Contracts.csproj" />
     </ItemGroup>
 
 </Project>

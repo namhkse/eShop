@@ -4,27 +4,29 @@
     <TargetFramework>net10.0</TargetFramework>
     <UserSecretsId>2d86f364-a439-47c5-9468-3b85a7d9a18e</UserSecretsId>
     <Nullable>enable</Nullable>
-    <RootNamespace>eShop.WebApp</RootNamespace>
+    <RootNamespace>Shop.WebApp</RootNamespace>
 
     <!-- Disable RZ10021, which is failing due to a Razor bug, according to Mackinnon. -->
     <NoWarn>$(NoWarn);RZ10021</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />
     <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Shop.Contracts\Shop.Contracts.csproj" />
     <ProjectReference Include="..\WebAppComponents\WebAppComponents.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Asp.Versioning.Http.Client" Version="10.0.0-preview.2" />
-    <PackageReference Include="Aspire.Azure.AI.OpenAI" Version="13.2.0-preview.1.26170.3"/>
-    <PackageReference Include="CommunityToolkit.Aspire.OllamaSharp" Version="13.1.1"  />
-    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="10.4.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.5"/>
-    <PackageReference Include="Google.Protobuf" Version="3.33.5"/>
-    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.76.0"/>
-    <PackageReference Include="Grpc.Tools" PrivateAssets="All" Version="2.78.0"/>
+    <PackageReference Include="Asp.Versioning.Http.Client"/>
+    <PackageReference Include="Aspire.Azure.AI.OpenAI" />
+    <PackageReference Include="CommunityToolkit.Aspire.OllamaSharp" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery.Yarp" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+    <PackageReference Include="Google.Protobuf" />
+    <PackageReference Include="Grpc.Net.ClientFactory" />
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.RabbitMQ" />
+    <PackageReference Include="Grpc.Tools" />
   </ItemGroup>
 
   <ItemGroup>

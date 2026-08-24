@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 using eShop.WebAppComponents.Services;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
+using Shop.WebApp.Services;
 
-namespace eShop.WebApp.Chatbot;
+namespace Shop.WebApp.Components.Chatbot;
 
 public class ChatState
 {

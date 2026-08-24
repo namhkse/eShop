@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace eShop.WebApp.Services;
+namespace Shop.WebApp.Services;
 
 public class BasketCheckoutInfo
 {

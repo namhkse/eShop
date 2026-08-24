@@ -37,7 +37,7 @@ public class OrderItem : Entity
         Units = units;
     }
 
-    public void SetDiscount(decimal discount)
+    public void SetNewDiscount(decimal discount)
     {
         if (discount <= 0)
             throw new ArgumentOutOfRangeException("Discount is not valid");

@@ -1,6 +1,6 @@
-using Ordering.API.Application.Commands;
+using Ordering.API.Application.Orders.CreateOrderDraft;
 
-namespace Ordering.API.Application;
+namespace Ordering.API.Application.Commands;
 
 public static class BasketItemExtensions
 {
@@ -14,13 +14,12 @@ public static class BasketItemExtensions
 
     public static OrderItemDTO ToOrderItemDTO(this BasketItem item)
     {
-        return new OrderItemDTO()
-        {
-            ProductId = item.ProductId,
-            ProductName = item.ProductName,
-            PictureUrl = item.PictureUrl,
-            UnitPrice = item.UnitPrice,
-            Units = item.Quantity
-        };
+        return new OrderItemDTO(
+            item.ProductId,
+            item.ProductName,
+            item.UnitPrice,
+            0,
+            item.Quantity,
+            item.PictureUrl);
     }
 }

@@ -12,7 +12,7 @@ builder.AddNpgsqlDbContext<ApplicationDbContext>("identitydb");
 // Apply database migration automatically. Note that this approach is not
 // recommended for production scenarios. Consider generating SQL scripts from
 // migrations instead.
-builder.Services.AddMigration<ApplicationDbContext, UsersSeed>();
+// TODO: builder.Services.AddMigration<ApplicationDbContext, UsersSeed>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -44,8 +44,6 @@ builder.Services.AddTransient<ILoginService<ApplicationUser>, EFLoginService>();
 builder.Services.AddTransient<IRedirectService, RedirectService>();
 
 var app = builder.Build();
-
-app.MapDefaultEndpoints();
 
 app.UseStaticFiles();
 

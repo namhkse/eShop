@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace eShop.WebApp.Services.OrderStatus;
+namespace Shop.WebApp.Services.OrderStatus;
 
 public class OrderStatusNotificationService
 {
