@@ -8,36 +8,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Protobuf Include="Protos\basket.proto" GrpcServices="Server"/>
+        <Protobuf Include="Protos\basket.proto" GrpcServices="Server" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL"/>
-        <PackageReference Include="Aspire.StackExchange.Redis"/>
-        <PackageReference Include="Google.Protobuf"/>
-        <PackageReference Include="Grpc.AspNetCore"/>
-        <PackageReference Include="Grpc.Net.Client"/>
-        <PackageReference Include="Grpc.Tools">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        
+        <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+        <PackageReference Include="Aspire.StackExchange.Redis" />
+        <PackageReference Include="Google.Protobuf" />
+        <PackageReference Include="Grpc.AspNetCore" />
+        <PackageReference Include="Grpc.Net.Client" />
+        <PackageReference Include="Grpc.Tools" />
         <PackageReference Include="MassTransit" />
         <PackageReference Include="MassTransit.RabbitMQ" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-<!--      <ProjectReference Include="..\EventBusRabbitMQ\EventBusRabbitMQ.csproj" />-->
-<!--      <ProjectReference Include="..\EventBus\EventBus.csproj" />-->
-<!--      <ProjectReference Include="..\Ordering.API\Ordering.API.csproj" />-->
-      <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
       <ProjectReference Include="..\Shop.Contracts\Shop.Contracts.csproj" />
+      <ProjectReference Include="..\Shop.ServiceDefaults\Shop.ServiceDefaults.csproj" />
     </ItemGroup>
 
 </Project>

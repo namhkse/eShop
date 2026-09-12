@@ -1,7 +1,4 @@
-﻿using Ordering.Domain.OrderAggregate;
-
-namespace Shop.Contracts.Orders;
-
+﻿namespace Shop.Contracts.Orders;
 
 public record OrderStatusChangedToPaidIntegrationEvent(
     int OrderId,

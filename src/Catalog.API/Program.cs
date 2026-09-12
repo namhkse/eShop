@@ -39,7 +39,10 @@ builder.Services.AddMassTransit(busConfigurator =>
     busConfigurator.SetKebabCaseEndpointNameFormatter();
 
     busConfigurator.AddConsumer<OrderStatusChangedToPaidIntegrationEventHandler>();
-    busConfigurator.AddConsumer<OrderStatusChangedToAwaitingValidationIntegrationEventHandler>();
+    
+    busConfigurator.AddConsumer<
+        OrderStatusChangedToAwaitingValidationIntegrationEventHandler,
+        OrderStatusChangedToAwaitingValidationConsumerDefinition>();
 
     busConfigurator.UsingRabbitMq((ctx,
             cfg) =>
@@ -51,7 +54,7 @@ builder.Services.AddMassTransit(busConfigurator =>
                     h.Username(rabbitMqSettings.UserName);
                     h.Password(rabbitMqSettings.Password);
                 });
-
+            
             cfg.ConfigureEndpoints(ctx);
         }
     );

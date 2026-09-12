@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 
-namespace ServiceDefaults;
+namespace Shop.ServiceDefaults;
 
 public static class ConfigurationExtensions
 {

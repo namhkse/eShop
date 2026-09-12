@@ -10,9 +10,4 @@
       <Folder Include="Baskets\" />
       <Folder Include="WebApp\" />
     </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
-    </ItemGroup>
-
 </Project>

@@ -16,7 +16,7 @@ public class OrderStatusChangedToStockConfirmedIntegrationEventHandler(
     {
         var message = context.Message;
 
-        logger.LogInformation("Handling integration event: {IntegrationEventId} - ({@IntegrationEvent})",
+        logger.LogInformation("Foo Handling integration event: {IntegrationEventId} - ({@IntegrationEvent})",
             context.MessageId,
             context.Message.GetType().Name);
 

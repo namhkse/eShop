@@ -5,6 +5,15 @@ using Shop.Contracts.Orders;
 
 namespace Shop.WebApp.Services.OrderStatus.IntegrationEvents.EventHandling;
 
+public class OrderStatusChangedToAwaitingValidationConsumerDefinition
+    : ConsumerDefinition<OrderStatusChangedToAwaitingValidationIntegrationEventHandler>
+{
+    public OrderStatusChangedToAwaitingValidationConsumerDefinition()
+    {
+        EndpointName = "webapp-order-status-changed-to-awaiting-validation";
+    }
+}
+
 public class OrderStatusChangedToAwaitingValidationIntegrationEventHandler(
     OrderStatusNotificationService orderStatusNotificationService,
     ILogger<OrderStatusChangedToAwaitingValidationIntegrationEventHandler> logger)

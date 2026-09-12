@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using Grpc.Core;
 
-namespace Basket.API.Extensions;
+namespace Basket.API;
 
-public static class ServerCallContextIdentityExtensions
+public static class Extensions
 {
     public static string? GetUserIdentity(this ServerCallContext context)
         => context.GetHttpContext().User.FindFirst("sub")?.Value;

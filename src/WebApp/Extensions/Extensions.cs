@@ -33,12 +33,15 @@ public static class Extensions
 
             busConfigurator.SetKebabCaseEndpointNameFormatter();
 
-            busConfigurator.AddConsumer<OrderStatusChangedToAwaitingValidationIntegrationEventHandler>();
+            busConfigurator.AddConsumer<
+                OrderStatusChangedToAwaitingValidationIntegrationEventHandler,
+                OrderStatusChangedToAwaitingValidationConsumerDefinition>();
+            
             busConfigurator.AddConsumer<OrderStatusChangedToShippedIntegrationEventHandler>();
-            busConfigurator.AddConsumer<OrderStatusChangedToPaidIntegrationEventHandler>();
+            busConfigurator.AddConsumer<OrderStatusChangedToPaidIntegrationEventHandler, OrderStatusChangedToPaidIntegrationEventHandlerDefinition>();
             busConfigurator.AddConsumer<OrderStatusChangedToShippedIntegrationEventHandler>();
-            busConfigurator.AddConsumer<OrderStatusChangedToStockConfirmedIntegrationEventHandler>();
-            busConfigurator.AddConsumer<OrderStatusChangedToSubmittedIntegrationEventHandler>();
+            busConfigurator.AddConsumer<OrderStatusChangedToStockConfirmedIntegrationEventHandler, OrderStatusChangedToStockConfirmedIntegrationEventHandlerDefinition>();
+            busConfigurator.AddConsumer<OrderStatusChangedToSubmittedIntegrationEventHandler, OrderStatusChangedToSubmittedIntegrationEventHandlerDefinition>();
 
             busConfigurator.UsingRabbitMq((ctx, cfg) =>
                 {
@@ -47,7 +50,7 @@ public static class Extensions
                         h.Username(rabbitMqSettings.UserName);
                         h.Password(rabbitMqSettings.Password);
                     });
-
+                    
                     cfg.ConfigureEndpoints(ctx);
                 }
             );
