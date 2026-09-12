@@ -1,9 +1,4 @@
-﻿using ServiceDefaults;
-using Shared;
-
-var builder = WebApplication.CreateBuilder(args);
-
-builder.AddServiceDefaults();
+﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 

@@ -1,7 +1,7 @@
 ﻿
-using Shared;
+using Shop.ServiceDefaults;
 
-namespace eShop.Identity.API;
+namespace Identity.API;
 
 public class UsersSeed(ILogger<UsersSeed> logger, UserManager<ApplicationUser> userManager) : IDbSeeder<ApplicationDbContext>
 {
