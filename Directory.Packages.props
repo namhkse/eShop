@@ -100,5 +100,6 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version=" 10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12"/>
+    <PackageVersion Include="Grpc.Net.Client" Version="2.83.0"/>
   </ItemGroup>
 </Project>

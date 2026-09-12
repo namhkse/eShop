@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using Pgvector;
-using Shared;
+using Shop.ServiceDefaults;
 
 namespace Catalog.API.Infrastructure;
 
