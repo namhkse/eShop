@@ -1,6 +1,6 @@
 using Ordering.Domain.BuyerAggregate;
 using Ordering.Infrastructure;
-using Shared;
+using Shop.ServiceDefaults;
 
 namespace Ordering.API.Infrastructure;
 

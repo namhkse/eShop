@@ -1,4 +1,3 @@
-using EventBus;
 using MediatR;
 
 namespace Ordering.API.Application.Behaviors;

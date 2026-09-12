@@ -1,5 +1,4 @@
 using eShop.Catalog.API.IntegrationEvents.Events;
-using EventBus;
 using MassTransit;
 using MediatR;
 using Ordering.API.Application.Orders.SetStockRejectedOrderStatus;

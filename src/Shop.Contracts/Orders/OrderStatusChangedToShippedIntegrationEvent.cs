@@ -1,4 +1,6 @@
-﻿namespace Shop.Contracts.Orders;
+﻿using Ordering.Domain.OrderAggregate;
+
+namespace Shop.Contracts.Orders;
 
 public record OrderStatusChangedToShippedIntegrationEvent(
     int OrderId,

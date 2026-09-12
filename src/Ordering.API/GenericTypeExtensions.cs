@@ -1,4 +1,4 @@
-namespace EventBus;
+namespace Ordering.API;
 
 public static class GenericTypeExtensions
 {

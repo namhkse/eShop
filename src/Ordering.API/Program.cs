@@ -10,8 +10,8 @@ using Ordering.Domain.OrderAggregate;
 using Ordering.Infrastructure;
 using Ordering.Infrastructure.Idempotency;
 using Ordering.Infrastructure.Repositories;
-using ServiceDefaults;
 using Shop.Contracts;
+using Shop.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 

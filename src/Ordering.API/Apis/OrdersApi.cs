@@ -1,4 +1,3 @@
-using EventBus;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.API.Application;

@@ -10,8 +10,4 @@
       <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\EventBus\EventBus.csproj" />
-    </ItemGroup>
-
 </Project>

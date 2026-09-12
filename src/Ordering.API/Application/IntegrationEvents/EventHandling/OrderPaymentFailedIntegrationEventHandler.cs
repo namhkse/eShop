@@ -1,8 +1,5 @@
-using EventBus;
-using EventBus.Abstractions;
 using MassTransit;
 using MediatR;
-using Ordering.API.Application.Commands;
 using Ordering.API.Application.Orders.CancelOrder;
 using OrderPaymentFailedIntegrationEvent = Shop.Contracts.Payments.OrderPaymentFailedIntegrationEvent;
 

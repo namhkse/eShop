@@ -1,4 +1,3 @@
-using EventBus;
 using MassTransit;
 using MediatR;
 using Ordering.API.Application.Orders.SetPaidOrderStatus;

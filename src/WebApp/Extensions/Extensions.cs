@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
-using ServiceDefaults;
 using Shop.Contracts;
 using Shop.WebApp.Services;
 using Shop.WebApp.Services.OrderStatus;

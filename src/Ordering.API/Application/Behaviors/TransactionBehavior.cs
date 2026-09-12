@@ -1,4 +1,3 @@
-using EventBus;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Ordering.API.Application.IntegrationEvents;

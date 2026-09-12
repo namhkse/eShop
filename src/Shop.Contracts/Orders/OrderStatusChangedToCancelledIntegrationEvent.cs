@@ -1,4 +1,6 @@
 ﻿
+using Ordering.Domain.OrderAggregate;
+
 namespace Shop.Contracts.Orders;
 
 public record OrderStatusChangedToCancelledIntegrationEvent(

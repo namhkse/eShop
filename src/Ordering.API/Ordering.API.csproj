@@ -12,25 +12,17 @@
         <PackageReference Include="MediatR" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
         <PackageReference Include="MassTransit" />
         <PackageReference Include="MassTransit.RabbitMQ" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
       <ProjectReference Include="..\Ordering.Infrastructure\Ordering.Infrastructure.csproj" />
-      <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
-      <ProjectReference Include="..\Shared\Shared.csproj" />
       <ProjectReference Include="..\Shop.Contracts\Shop.Contracts.csproj" />
+      <ProjectReference Include="..\Shop.ServiceDefaults\Shop.ServiceDefaults.csproj" />
     </ItemGroup>
 
 </Project>

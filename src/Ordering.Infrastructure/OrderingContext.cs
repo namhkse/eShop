@@ -1,5 +1,3 @@
-using System.Transactions;
-using IntegrationEventLogEF;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -9,8 +7,8 @@ using Ordering.Domain.SeedWork;
 
 namespace Ordering.Infrastructure;
 
-public class OrderingContext : DbContext,
-    IUnitOfWork
+public class OrderingContext(DbContextOptions<OrderingContext> options, IMediator mediator)
+    : DbContext(options), IUnitOfWork
 {
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
@@ -18,26 +16,12 @@ public class OrderingContext : DbContext,
     public DbSet<Buyer> Buyers { get; set; }
     public DbSet<CardType> CardTypes { get; set; }
 
-    private readonly IMediator _mediator;
     private IDbContextTransaction _currentTransaction;
-
-    public OrderingContext(DbContextOptions<OrderingContext> options) : base(options)
-    {
-    }
 
     public IDbContextTransaction GetCurrentTransaction() =>
         _currentTransaction;
 
-    public bool HasActiveTransaction =>
-        _currentTransaction != null;
-
-    public OrderingContext(DbContextOptions<OrderingContext> options, IMediator mediator) : base(options)
-    {
-        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-
-
-        System.Diagnostics.Debug.WriteLine("OrderingContext::ctor ->" + this.GetHashCode());
-    }
+    public bool HasActiveTransaction => _currentTransaction != null;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,7 +32,6 @@ public class OrderingContext : DbContext,
         modelBuilder.ApplyConfiguration(new OrderItemEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new CardTypeEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new BuyerEntityTypeConfiguration());
-        modelBuilder.UseIntegrationEventLogs();
     }
 
     public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default)
@@ -59,7 +42,7 @@ public class OrderingContext : DbContext,
         // side effects from the domain event handlers which are using the same DbContext with "InstancePerLifetimeScope" or "scoped" lifetime
         // B) Right AFTER committing data (EF SaveChanges) into the DB will make multiple transactions. 
         // You will need to handle eventual consistency and compensatory actions in case of failures in any of the Handlers. 
-        await _mediator.DispatchDomainEventsAsync(this);
+        await mediator.DispatchDomainEventsAsync(this);
         
         _ = await base.SaveChangesAsync(cancellationToken);
 

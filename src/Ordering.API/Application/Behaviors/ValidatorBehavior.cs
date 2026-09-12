@@ -1,4 +1,3 @@
-using EventBus;
 using FluentValidation;
 using MediatR;
 using Ordering.Domain.Exceptions;

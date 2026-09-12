@@ -1,5 +1,4 @@
 using eShop.Ordering.API.Application.IntegrationEvents.Events;
-using EventBus;
 using MassTransit;
 using MediatR;
 using Ordering.API.Application.Orders.SetStockConfirmedOrderStatus;
