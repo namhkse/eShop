@@ -1,0 +1,147 @@
+version: '3.4'
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourWeak(!)Password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgweb:
+    image: sosedoff/pgweb:latest
+    container_name: pgweb
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+    command: ["--bind=0.0.0.0", "--listen=8081"]
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  identity:
+    build:
+      context: .
+      dockerfile: src/Identity.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5223
+      ConnectionStrings__IdentityDB: Host=db;Database=IdentityDB;Username=postgres;Password=yourWeak(!)Password
+      WebAppClient2: http://webapp
+      WebAppClient: "http://localhost:5045"
+    ports:
+      - "5223:5223"
+    depends_on:
+      - db
+
+  webapp:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: src/WebApp/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      ConnectionStrings__RabbitMQ: amqp://guest:guest@rabbitmq:5672/
+      SessionCookieLifetimeMinutes": 60,
+      IdentityUrl: http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5223
+      CallBackUrl: "http://webapp:5045/signin-oidc"
+      BasketAPI: http://basket-api:8080
+      CatalogAPI: http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:6002
+      OrderingAPI: http://ordering-api:8080
+    ports:
+      - "5045:80"
+    depends_on:
+      - redis
+      - rabbitmq
+
+  basket-api:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: src/Basket.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__redis: redis:6379
+      ConnectionStrings__RabbitMQ: amqp://guest:guest@rabbitmq:5672/
+      Identity__Url: http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5223
+      Identity__Audience: basket
+    depends_on:
+      - redis
+      - rabbitmq
+ 
+  catalog-api:
+    build:
+      context: .
+      dockerfile: src/Catalog.API/Dockerfile
+    ports:
+      - "6002:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__CatalogDB: Host=db;Database=CatalogDB;Username=postgres;Password=yourWeak(!)Password
+      ConnectionStrings__RabbitMQ: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - db
+      - rabbitmq
+
+  ordering-api:
+    build:
+      context: .
+      dockerfile: src/Ordering.API/Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__OrderingDB: Host=db;Database=OrderingDB;Username=postgres;Password=yourWeak(!)Password
+      ConnectionStrings__RabbitMQ: amqp://guest:guest@rabbitmq:5672/
+      Identity__Url: http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5223
+      Identity__Audience: orders
+    depends_on:
+      - db
+      - rabbitmq
+
+  order-processor:
+    build:
+      context: .
+      dockerfile: src/OrderProcessor/Dockerfile
+    environment:
+      # ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__OrderingDB: Host=db;Database=OrderingDB;Username=postgres;Password=yourWeak(!)Password
+      ConnectionStrings__RabbitMQ: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - db
+      - rabbitmq
+
+  payment-processor:
+    build:
+      context: .
+      dockerfile: src/PaymentProcessor/Dockerfile
+    environment:
+      ConnectionStrings__RabbitMQ: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - rabbitmq
+
+volumes:
+  pgdata:
+  rabbitmq_data:
+  redis_data:  
+    
